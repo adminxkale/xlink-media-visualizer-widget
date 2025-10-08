@@ -1,21 +1,29 @@
-import type { NextApiRequest,NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { url } = req.query;
-    if (!url || typeof url !== 'string') {
-        return res.status(400).json({ error: 'URL is required' });
-    }
-    //const apiUrl = `https://api.xlinkapp.cloud/management-multitenant/external/management-tables/xlink-${process.env.NEXT_PUBLIC_STAGE}-channel/${tenantId}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            return res.status(response.status).json({ error: 'Failed to fetch media' });
-        }
-        const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
-        const buffer = await response.arrayBuffer();
-        res.setHeader('Content-Type', contentType);
-        res.send(Buffer.from(buffer));
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const { bussinesNumber } = req.query;
+  const { clientNumber } = req.query;
+
+  if (!bussinesNumber) {
+    res.status(400).json({ error: "Missing bussines_number parameter" });
+    return;
+  }
+    if (!clientNumber) {
+    res.status(400).json({ error: "Missing clientNumber parameter" });
+    return;
+  } 
+  const apiUrl = `https://1p7yki6h17.execute-api.us-east-1.amazonaws.com/dev/${bussinesNumber}/${clientNumber}`;
+  //const apiUrl = `https://zqi6swpat4.execute-api.us-east-1.amazonaws.com/dev/xlink_groups/${encodeURIComponent(
+
+  try {
+    const apiRes = await fetch(apiUrl);
+    const data = await apiRes.json();
+    res.status(apiRes.status).json(data);
+  } catch (err) {
+    console.error("[proxy-media] fetch error", err);
+    res.status(500).json({ error: "Proxy error" });
+  }
 }

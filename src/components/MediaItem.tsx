@@ -4,7 +4,7 @@ import MediaContent from "./MediaContent";
 /**
  * El componente principal `MediaItem` que muestra el contenido y metadatos, con estilo de burbuja.
  */
-const MediaItem: React.FC<MediaItemProps> = ({ senderName, sentDate, media, senderType }) => {
+const MediaItem: React.FC<MediaItemProps> = ({ senderName, recievedAt, media, senderType }) => {
   const getFileNameFromUrl = (url: string): string => {
   try {
     const urlObj = new URL(url);
@@ -20,7 +20,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, sentDate, media, send
   }
 };
     // 1. Definir estilos de posicionamiento (izquierda/derecha)
-  const isClient = senderType === 'client';
+  const isClient = senderType === 'Client'; // Ajusta según tu lógica real
   const bubbleContainerClasses = isClient ? 'justify-start' : 'justify-end';
 
   // 2. Definir estilos de la burbuja (color y esquinas)
@@ -59,7 +59,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, sentDate, media, send
         </div>
         {/* Fecha de Envío (Metadatos) */}
         <div className={`text-xs opacity-75 ${metaClasses}`}>
-          {sentDate}
+          {recievedAt}
         </div>
       </div>
     </div>

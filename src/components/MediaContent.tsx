@@ -13,7 +13,22 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
                 // El tag <img> soporta WebP de forma nativa en la mayoría de los navegadores.
                 <img
                     src={media.url}
-                    alt={media.altText}
+                    // El tamaño se ajusta al contenido de la burbuja, no al 100% de la pantalla
+                    className={`h-48 object-cover rounded-md`}
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        // Usamos un placeholder genérico que incluye el texto de WebP si aplica
+                        target.src = `https://placehold.co/400x200/374151/FFFFFF?text=${encodeURIComponent(imagePlaceholderText)}`;
+                        target.alt = 'Error al cargar imagen';
+                    }}
+                />
+            );
+        case 'sticker':
+            return (
+                // El tag <img> soporta WebP de forma nativa en la mayoría de los navegadores.
+                <img
+                    src={media.url}
                     // El tamaño se ajusta al contenido de la burbuja, no al 100% de la pantalla
                     className={`h-48 object-cover rounded-md`}
                     onError={(e) => {
@@ -40,6 +55,23 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
                     </svg>
                     <audio controls src={media.url} className="flex-grow"></audio>
                 </div>
+            );
+        case 'file':
+            return (
+                // Para archivos genéricos, solo mostramos un botón/área de descarga o visualización simple.
+                <a
+                    href={media.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center p-3 transition-colors duration-150 rounded-lg hover:bg-gray-200"
+                >
+                    <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {/* Icono de documento/archivo */}
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-5 5h-1a2 2 0 01-2-2V7a2 2 0 012-2h4l4 4v10a2 2 0 01-2 2h-1.5" />
+                    </svg>
+                    {/* El nombre del archivo ya se muestra fuera de este componente, aquí damos un indicador */}
+                    <span className="truncate">Descargar Archivo</span>
+                </a>
             );
         default:
             return (
