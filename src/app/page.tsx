@@ -1,9 +1,11 @@
 'use client';
 
-import React, { use, useEffect } from 'react';
+import React, { use, useEffect, useRef } from 'react';
 import xlinkLogo from "@/assets/images/xlink_logo_v2.png";
 import Image from "next/image";
 import MediaItem from '@/components/MediaItem';
+import { useWebSocket } from '@/app/hooks/WebSocket';
+import { randomUUID } from 'crypto';
 
 
 // --- Componente Principal de la Aplicación (para demostración de chat) ---
@@ -58,146 +60,153 @@ const demoMediaItems: MediaItemProps[] = [
  * Componente principal que actúa como contenedor de la aplicación de chat.
  * Debe ser el componente exportado por defecto en un entorno de archivo único React.
  */
-export default function ChatInterface() { // Renombrado de App a ChatInterface
-
+export default function ChatInterface() {
   const [authLoading, setAuthLoading] = React.useState(false);
   const [authError, setAuthError] = React.useState<string | null>(null);
   const [agent, setAgent] = React.useState<{ name: string; id: string } | null>(null);
   const [conversationId, setConversationId] = React.useState<string | null>(null);
   const [retryKey, setRetryKey] = React.useState(0);
-  const [mediaItems, setMediaItems] = React.useState<MediaItemProps[]>();
+  const [mediaItems, setMediaItems] = React.useState<MediaItemProps[]>([]);
+  const { message, sendMessage } = useWebSocket(
+    "wss://586bco3lvf.execute-api.us-east-1.amazonaws.com/production?business=12053505800&client=593992966075"
+  );
 
-    const fetchMedia = async () => {
+  // 🔹 Referencia al contenedor del chat
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // 🔹 Scroll automático al final cuando cambia mediaItems
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [mediaItems]);
+
+  const fetchMedia = async () => {
     try {
-      const res = await fetch(`/api/proxy-media/?bussinesNumber=12053505800&clientNumber=593990302992`);
+      const res = await fetch(`/api/proxy-media/?bussinesNumber=12053505800&clientNumber=593992966075`);
       if (!res.ok) throw new Error(`Error fetching media: ${res.statusText}`);
       const data = await res.json();
       console.log("Fetched media items:", data);
-      // Aquí podrías actualizar el estado con los nuevos items de media
       return data;
     } catch (error) {
       console.error("Fetch media error:", error);
     }
-  }
-
-
+  };
 
   useEffect(() => {
-   fetchMedia().then((res)=>{
-    console.log("hola",res.data.medias)
-    setMediaItems(res.data.medias);
-   })
+    if (message) {
+      console.log("Nuevo mensaje recibido via WebSocket:", message);
+      setMediaItems((prevItems) => (prevItems ? [...prevItems, message] : [message]));
+    }
+  }, [message]);
+
+  useEffect(() => {
+    fetchMedia().then((res) => {
+      setMediaItems(res.data.medias);
+    });
   }, []);
 
 
-
-  // --- OAuth Genesys Cloud ---
-  // Obtiene el parámetro org de la URL (?org=...)
-  function getOrgFromUrl() {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      let org = params.get('org');
-      return org || 'Xkale';
-    }
-    return 'Xkale';
-  }
-
-/*
-  useEffect(() => {
-    async function authenticateGenesys() {
-      setAuthLoading(true);
-      setAuthError(null);
-
-      //const org = getOrgFromUrl();
-      const clientId = process.env.NEXT_PUBLIC_GENESYS_CLIENT_ID;
-      //const clientSecret = process.env.NEXT_PUBLIC_GENESYS_CLIENT_SECRET;
-      const environment = process.env.NEXT_PUBLIC_GENESYS_ENVIRONMENT;
-
-
-
-      try {
-        const url = window.location.href;
-
-        // 1️⃣ Buscar conversationId primero en hash (#)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        let conversationId = hashParams.get("conversationId");
-
-        // 2️⃣ Si no está en hash, buscar en query string (?)
-        if (!conversationId) {
-          const queryParams = new URLSearchParams(window.location.search.substring(1));
-          conversationId = queryParams.get("conversationId");
-        }
-
-        // 3️⃣ Si aún no está, revisar localStorage (lo guardamos antes del redirect)
-        if (!conversationId) {
-          conversationId = localStorage.getItem("genesys_conversation_id") || "";
-        }
-
-        // 4️⃣ Si lo encontramos, guardarlo en localStorage para persistirlo
-        if (conversationId) {
-
-          localStorage.setItem("genesys_conversation_id", conversationId);
-          setConversationId(conversationId);
-
-        } else {
-          console.warn("⚠️ No se encontró conversationId en la URL ni en storage");
-
-        }
-
-        // 5️⃣ Revisar si ya hay access_token en la URL
-        const hash = window.location.hash;
-        let accessToken = "";
-        if (hash.includes("access_token=")) {
-          accessToken = hash.split("access_token=")[1].split("&")[0];
-          localStorage.setItem("genesys_access_token", accessToken);
-        } else {
-          accessToken = localStorage.getItem("genesys_access_token") || "";
-        }
-
-        // 6️⃣ Si no hay token, redirigir a OAuth (pero antes guardar conversationId)
-        if (!accessToken) {
-          if (conversationId) {
-            localStorage.setItem("genesys_conversation_id", conversationId);
+    
+    useEffect(() => {
+      async function authenticateGenesys() {
+        setAuthLoading(true);
+        setAuthError(null);
+  
+        //const org = getOrgFromUrl();
+        const clientId = process.env.NEXT_PUBLIC_GENESYS_CLIENT_ID;
+        //const clientSecret = process.env.NEXT_PUBLIC_GENESYS_CLIENT_SECRET;
+        const environment = process.env.NEXT_PUBLIC_GENESYS_ENVIRONMENT;
+  
+  
+  
+        try {
+          const url = window.location.href;
+  
+          // 1️⃣ Buscar conversationId primero en hash (#)
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          let conversationId = hashParams.get("conversationId");
+  
+          // 2️⃣ Si no está en hash, buscar en query string (?)
+          if (!conversationId) {
+            const queryParams = new URLSearchParams(window.location.search.substring(1));
+            conversationId = queryParams.get("conversationId");
           }
-          const redirectUri = `${window.location.origin}/`;
-
-          const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-          window.location.replace(authUrl);
-          return;
+  
+          // 3️⃣ Si aún no está, revisar localStorage (lo guardamos antes del redirect)
+          if (!conversationId) {
+            conversationId = localStorage.getItem("genesys_conversation_id") || "";
+          }
+  
+          // 4️⃣ Si lo encontramos, guardarlo en localStorage para persistirlo
+          if (conversationId) {
+  
+            localStorage.setItem("genesys_conversation_id", conversationId);
+            setConversationId(conversationId);
+  
+          } else {
+            console.warn("⚠️ No se encontró conversationId en la URL ni en storage");
+  
+          }
+  
+          // 5️⃣ Revisar si ya hay access_token en la URL
+          const hash = window.location.hash;
+          let accessToken = "";
+          if (hash.includes("access_token=")) {
+            accessToken = hash.split("access_token=")[1].split("&")[0];
+            localStorage.setItem("genesys_access_token", accessToken);
+          } else {
+            accessToken = localStorage.getItem("genesys_access_token") || "";
+          }
+  
+          // 6️⃣ Si no hay token, redirigir a OAuth (pero antes guardar conversationId)
+          if (!accessToken) {
+            if (conversationId) {
+              localStorage.setItem("genesys_conversation_id", conversationId);
+            }
+            const redirectUri = `${window.location.origin}/`;
+  
+            const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            window.location.replace(authUrl);
+            return;
+          }
+  
+          // 7️⃣ Llamar al API para obtener datos del agente
+          const userRes = await fetch(`https://api.${environment}/api/v2/users/me`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          if (!userRes.ok) throw new Error("No se pudo obtener el usuario de Genesys Cloud");
+  
+          const userData = await userRes.json();
+          setAgent({ name: userData.name, id: userData.id });
+  
+          // 8️⃣ Obtener grupos del agente
+          const userGroupsRes = await fetch(
+            `https://api.${environment}/api/v2/users/${userData.id}?expand=groups`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+          if (userGroupsRes.ok) {
+            const userGroupsData = await userGroupsRes.json();
+            const groupIds = (userGroupsData.groups || []).map((g: any) => g.id);
+          } else {
+  
+          }
+  
+        } catch (e: any) {
+          setAuthError(e?.message || "Error desconocido de autenticación");
+          localStorage.removeItem("genesys_access_token");
         }
-
-        // 7️⃣ Llamar al API para obtener datos del agente
-        const userRes = await fetch(`https://api.${environment}/api/v2/users/me`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        if (!userRes.ok) throw new Error("No se pudo obtener el usuario de Genesys Cloud");
-
-        const userData = await userRes.json();
-        setAgent({ name: userData.name, id: userData.id });
-
-        // 8️⃣ Obtener grupos del agente
-        const userGroupsRes = await fetch(
-          `https://api.${environment}/api/v2/users/${userData.id}?expand=groups`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        if (userGroupsRes.ok) {
-          const userGroupsData = await userGroupsRes.json();
-          const groupIds = (userGroupsData.groups || []).map((g: any) => g.id);
-        } else {
-
-        }
-
-      } catch (e: any) {
-        setAuthError(e?.message || "Error desconocido de autenticación");
-        localStorage.removeItem("genesys_access_token");
+  
+        setAuthLoading(false);
       }
+  
+      authenticateGenesys();
+    }, [retryKey]);
+  
 
-      setAuthLoading(false);
-    }
-
-    authenticateGenesys();
-  }, [retryKey]);
-*/
   if (authError) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
@@ -207,7 +216,7 @@ export default function ChatInterface() { // Renombrado de App a ChatInterface
           <button
             className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition"
             onClick={() => {
-              setRetryKey(k => k + 1);
+              setRetryKey((k) => k + 1);
               setAuthError(null);
             }}
           >
@@ -217,30 +226,23 @@ export default function ChatInterface() { // Renombrado de App a ChatInterface
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
       <header className="mb-10 flex items-center justify-center gap-6">
-        {/* Logo con efecto cuadrado con bordes redondeados */}
-
-        <Image
-          src={xlinkLogo}
-          alt="Xlink Logo"
-          width={90}
-          height={90}
-          className="rounded-lg"
-        />
-
-        {/* Título con estilos llamativos */}
+        <Image src={xlinkLogo} alt="Xlink Logo" width={90} height={90} className="rounded-lg" />
         <h1 className="text-4xl font-semibold text-gray-900 tracking-tight">
           Xlink media visualizer
         </h1>
       </header>
 
-
-      {/* Contenedor simulando el historial de chat */}
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-4 sm:p-6 h-[70vh] overflow-y-auto border border-gray-200">
+      {/* Contenedor del chat con referencia */}
+      <div
+        ref={chatContainerRef}
+        className="max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-4 sm:p-6 h-[70vh] overflow-y-auto border border-gray-200"
+      >
         {mediaItems?.map((item) => (
-          <MediaItem key={item.id} {...item} />
+          <MediaItem key={crypto.randomUUID()} {...item} />
         ))}
       </div>
     </div>

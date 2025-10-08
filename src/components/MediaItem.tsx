@@ -4,7 +4,21 @@ import MediaContent from "./MediaContent";
 /**
  * El componente principal `MediaItem` que muestra el contenido y metadatos, con estilo de burbuja.
  */
-const MediaItem: React.FC<MediaItemProps> = ({ senderName, recievedAt, media, senderType }) => {
+const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, senderType }) => {
+  
+  const formatDateTime = (dateString:string)=> {
+  const date = new Date(dateString);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `Hora: ${hours}:${minutes} Fecha: ${day}/${month}/${year} `;
+}
+
+
   const getFileNameFromUrl = (url: string): string => {
   try {
     const urlObj = new URL(url);
@@ -59,7 +73,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, recievedAt, media, se
         </div>
         {/* Fecha de Envío (Metadatos) */}
         <div className={`text-xs opacity-75 ${metaClasses}`}>
-          {recievedAt}
+          {formatDateTime(receivedAt)}
         </div>
       </div>
     </div>
