@@ -10,25 +10,25 @@ export function useWebSocket(url: string) {
     socketRef.current = socket;
 
     socket.onopen = () => {
-      console.log("[WebSocket] ✅ Conectado");
+      console.log("[WebSocket] Conectado");
     };
 
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data) as MediaItemProps;
-        console.log("[WebSocket] 📩 Mensaje recibido:", data);
+        console.log("[WebSocket] Mensaje recibido:", data);
         setMessage(data);
       } catch (error) {
-        console.error("[WebSocket] ❌ Error al parsear mensaje:", error);
+        console.error("[WebSocket] Error al parsear mensaje:", error);
       }
     };
 
     socket.onerror = (error) => {
-      console.error("[WebSocket] ⚠️ Error:", error);
+      console.error("[WebSocket] Error:", error);
     };
 
     socket.onclose = () => {
-      console.warn("[WebSocket] 🔌 Conexión cerrada");
+      console.warn("[WebSocket] Conexión cerrada");
     };
 
     return () => {

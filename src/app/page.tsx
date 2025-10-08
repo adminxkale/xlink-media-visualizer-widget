@@ -12,9 +12,8 @@ import { randomUUID } from 'crypto';
 /*
 const demoMediaItems: MediaItemProps[] = [
   {
-    id: '1',
     senderName: 'Ana García (Cliente)',
-    recievedAt: '2024-10-01 10:30',
+    receivedAt: '2024-10-01 10:30',
     media: {
       type: 'image',
       url: 'https://hips.hearstapps.com/hmg-prod/images/el-despertar-de-la-fuerza-1575448990.jpg?crop=1xw:1xh;center,top',
@@ -22,9 +21,8 @@ const demoMediaItems: MediaItemProps[] = [
     senderType: 'Client', // Cliente: Izquierda
   },
   {
-    id: '2',
     senderName: 'Agente Soporte',
-    recievedAt: '2024-10-01 11:15',
+    receivedAt: '2024-10-01 11:15',
     media: {
       type: 'video',
       url: 'https://www.w3schools.com/html/mov_bbb.mp4', // Ejemplo de video
@@ -33,9 +31,8 @@ const demoMediaItems: MediaItemProps[] = [
     senderType: 'Genesys', // Agente: Derecha
   },
   {
-    id: '3',
     senderName: 'Ana García (Cliente)',
-    recievedAt: '2024-10-01 12:45',
+    receivedAt: '2024-10-01 12:45',
     media: {
       type: 'audio',
       url: 'https://www.w3schools.com/html/horse.mp3', // Ejemplo de audio
@@ -44,9 +41,8 @@ const demoMediaItems: MediaItemProps[] = [
     senderType: 'Client', // Cliente: Izquierda
   },
   {
-    id: '4',
     senderName: 'Agente Soporte',
-    recievedAt: '2024-10-01 14:00',
+    receivedAt: '2024-10-01 14:00',
     media: {
       type: 'image',
       url: 'https://xlink-multimedia-files.s3.us-east-1.amazonaws.com/APLatam/Inbound/Image/20369_17_1074214594594053.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZTNJ2CTVPZCJXW4F%2F20251008%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251008T172042Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECkaCXVzLWVhc3QtMSJHMEUCIDXG8QIN4NPZ7yQ9fiu1jwsB58dy0SnYvjmPFFyMma0fAiEAk%2FFpPrT2jViuzfG49qMHsXXrpSRsLIFomclEbaEBKuAqiQMIwv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2NjAxNzA0Nzg4MjYiDG0dJ9CwGdcLZR%2FhUCrdAgM6nWjnleEdhHJSOP1W%2FZczSA4ddxGKNsztN15hH4LmpVNpVrD2aOze5nNp7HpKDYsNTHNpqQrsNLzXYAf6Db5UXMOlpjmDtHQuKnp5Of1JKSanMU4RTyS4%2BaFhjb5qwBI1LVnLq0TwEJFP8%2BjcBf8W4%2BsXni35O8qkHwtH3ymqQtyWPdaln31WD5JwQISjUG4QRm394N%2BmsSxjiF0uf4XHDVpZle5oUqq0eDGFggYNE%2Bfx4d1MsgRhsbAEqiv4KoGmoHVUOl%2F5HRZwL1VVgprXhpra%2BNk98YpIOE2CrUoLtBxgWD%2FnU9CRJvk%2FKjOWHchz7FP2aJeNXFZLpTvhz0J88IQrgRGmmIQ4ttLjc1F3ciOr5L5PgPhDYaGdWV5%2FnoWIaTCTXIewM65LENiM077cm3P%2BQajn6DYe%2BqNTk3oYfEoUy6xebl7PTKC%2BFa1mxI07M7DafBtjxyMusokwo7GaxwY6ngGd9IUqJgsT62wFWuM%2Ffpc0CJ9YRXYYW7AZP9FRwL%2FMkF99xI6bAY%2B5uCGahxUFxLA7rpf%2F3SuTw19Cxoi4HGWlXnf%2FQg4kQzPFh2W%2BfE09l7A%2FOMrM2tWLCvD9dt1%2Bp3ugRsyK1T10KhHwP9TKvyp3mbdLeou6d%2BwXUPNU4c84lx8K1MgztxY9frF9kMhi7IFj1X5KKeXlgaLvP%2BqwGg%3D%3D&X-Amz-Signature=0ce626b811ebf01d6142474e2b7f259bcd9a2858e5c06a757d0490721dd43129&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject',
@@ -54,8 +50,8 @@ const demoMediaItems: MediaItemProps[] = [
     senderType: 'Genesys', // Agente: Derecha
   },
 ];
-*/
 
+*/
 /**
  * Componente principal que actúa como contenedor de la aplicación de chat.
  * Debe ser el componente exportado por defecto en un entorno de archivo único React.
@@ -105,6 +101,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     fetchMedia().then((res) => {
+    
       setMediaItems(res.data.medias);
     });
   }, []);
