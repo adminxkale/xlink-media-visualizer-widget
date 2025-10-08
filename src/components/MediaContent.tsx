@@ -17,8 +17,6 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
     case "sticker":
       return (
         <Card
-          bordered={false}
-          bodyStyle={{ padding: 0 }}
           className="rounded-lg overflow-hidden shadow-sm"
         >
           <Image
@@ -45,8 +43,6 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
     case "video":
       return (
         <Card
-          bordered={false}
-          bodyStyle={{ padding: 0 }}
           className="rounded-lg overflow-hidden shadow-sm"
         >
           <video
@@ -67,7 +63,6 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
     case "audio":
       return (
         <Card
-          bordered
           size="small"
           className="rounded-lg overflow-hidden flex items-center gap-2 shadow-sm"
         >
@@ -90,33 +85,19 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
 
     case "file":
       return (
-        <Card
-          hoverable
-          className="rounded-lg border border-gray-200 flex items-center gap-2 shadow-sm"
-          bodyStyle={{ display: "flex", alignItems: "center", padding: "10px" }}
-        >
-          <svg
-            className="w-6 h-6 text-gray-600 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m-5 5h-1a2 2 0 01-2-2V7a2 2 0 012-2h4l4 4v10a2 2 0 01-2 2h-1.5"
-            />
-          </svg>
-          <a
-            href={media.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-grow text-blue-600 hover:underline truncate"
-          >
-            Descargar archivo
-          </a>
-        </Card>
+                <a
+                    href={media.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center p-3 transition-colors duration-150 rounded-lg hover:bg-gray-200"
+                >
+                    <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {/* Icono de documento/archivo */}
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-5 5h-1a2 2 0 01-2-2V7a2 2 0 012-2h4l4 4v10a2 2 0 01-2 2h-1.5" />
+                    </svg>
+                    {/* El nombre del archivo ya se muestra fuera de este componente, aquí damos un indicador */}
+                    <span className="truncate">Ver archivo</span>
+                </a>
       );
 
     default:

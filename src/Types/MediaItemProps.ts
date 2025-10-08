@@ -4,4 +4,5 @@ interface MediaItemProps {
   media: MediaData;
   // Nuevo campo para determinar la posición (burbuja de chat)
   senderType: "Client" | "Genesys";
+  delivered?: boolean;
 }

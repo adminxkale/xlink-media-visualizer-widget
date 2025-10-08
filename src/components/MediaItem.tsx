@@ -1,39 +1,40 @@
 import React from "react";
 import MediaContent from "./MediaContent";
+import Icon, { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 /**
  * El componente principal `MediaItem` que muestra el contenido y metadatos, con estilo de burbuja.
  */
-const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, senderType }) => {
-  
-  const formatDateTime = (dateString:string)=> {
-  const date = new Date(dateString);
+const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, senderType, delivered }) => {
 
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
 
-  return `Hora: ${hours}:${minutes} Fecha: ${day}/${month}/${year} `;
-}
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `Hora: ${hours}:${minutes} Fecha: ${day}/${month}/${year} `;
+  }
 
 
   const getFileNameFromUrl = (url: string): string => {
-  try {
-    const urlObj = new URL(url);
-    // Extrae el último segmento de la ruta, que es generalmente el nombre del archivo.
-    const path = urlObj.pathname;
-    // Decodifica para manejar caracteres especiales y toma el último segmento.
-    const fileName = decodeURIComponent(path.substring(path.lastIndexOf('/') + 1));
-    // Limpia parámetros de consulta si están presentes (ej: ?text=...)
-    return fileName.split('?')[0];
-  } catch (e) {
-    // Si la URL es inválida o falla la extracción, retorna un placeholder.
-    return 'Archivo adjunto';
-  }
-};
-    // 1. Definir estilos de posicionamiento (izquierda/derecha)
+    try {
+      const urlObj = new URL(url);
+      // Extrae el último segmento de la ruta, que es generalmente el nombre del archivo.
+      const path = urlObj.pathname;
+      // Decodifica para manejar caracteres especiales y toma el último segmento.
+      const fileName = decodeURIComponent(path.substring(path.lastIndexOf('/') + 1));
+      // Limpia parámetros de consulta si están presentes (ej: ?text=...)
+      return fileName.split('?')[0];
+    } catch (e) {
+      // Si la URL es inválida o falla la extracción, retorna un placeholder.
+      return 'Archivo adjunto';
+    }
+  };
+  // 1. Definir estilos de posicionamiento (izquierda/derecha)
   const isClient = senderType === 'Client'; // Ajusta según tu lógica real
   const bubbleContainerClasses = isClient ? 'justify-start' : 'justify-end';
 
@@ -72,9 +73,25 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
           <MediaContent media={media} />
         </div>
         {/* Fecha de Envío (Metadatos) */}
-        <div className={`text-xs opacity-75 ${metaClasses}`}>
-          {formatDateTime(receivedAt)}
+        <div className="flex justify-between items-center">
+          {senderType === "Client" ? (
+            <>
+            </>
+          ) : (
+            <>
+              <div className={`text-xs opacity-75 ${metaClasses}`}>
+                <>
+                  Entregado {delivered ? <CheckCircleOutlined /> : <CloseCircleOutlined/>}
+                </>
+              </div>
+              <div className={`text-xs opacity-75 ${metaClasses}`}>
+                {formatDateTime(receivedAt)}
+              </div>
+            </>
+
+          )}
         </div>
+
       </div>
     </div>
   );
