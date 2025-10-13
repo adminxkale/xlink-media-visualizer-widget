@@ -17,13 +17,11 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
     case "sticker":
       return (
         <Card
-          className="rounded-lg overflow-hidden shadow-sm"
+          className="rounded overflow-hidden shadow-sm"
         >
           <Image
             src={media.url}
             alt="media"
-            height={200}
-            width={300}
             style={{
               objectFit: "cover",
               borderRadius: "8px",

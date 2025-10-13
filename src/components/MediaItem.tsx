@@ -1,6 +1,6 @@
 import React from "react";
 import MediaContent from "./MediaContent";
-import Icon, { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import Icon, { CheckCircleOutlined, CheckOutlined, CloseCircleOutlined, CloseOutlined } from '@ant-design/icons';
 
 /**
  * El componente principal `MediaItem` que muestra el contenido y metadatos, con estilo de burbuja.
@@ -15,7 +15,6 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-
     return `Hora: ${hours}:${minutes} Fecha: ${day}/${month}/${year} `;
   }
 
@@ -40,7 +39,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
 
   // 2. Definir estilos de la burbuja (color y esquinas)
   const bubbleClasses = isClient
-    ? 'bg-gray-100 text-gray-800 rounded-br-xl rounded-tl-xl' // Burbuja izquierda (cliente)
+    ? 'bg-gray-200 text-gray-800 rounded-br-xl rounded-tl-xl' // Burbuja izquierda (cliente)
     : 'bg-indigo-500 text-white rounded-bl-xl rounded-tr-xl'; // Burbuja derecha (agente)
 
   // 3. Clases para metadatos (alineación del texto)
@@ -76,12 +75,17 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
         <div className="flex justify-between items-center">
           {senderType === "Client" ? (
             <>
+              <div className={`text-xs opacity-75 ${metaClasses}`}>
+                {formatDateTime(receivedAt)}
+              </div>
+              <div></div>
+
             </>
           ) : (
             <>
               <div className={`text-xs opacity-75 ${metaClasses}`}>
                 <>
-                  Entregado {delivered ? <CheckCircleOutlined /> : <CloseCircleOutlined/>}
+                  Entregado {delivered ? <><CheckOutlined /><CheckOutlined /></>  : <CloseOutlined />}
                 </>
               </div>
               <div className={`text-xs opacity-75 ${metaClasses}`}>
