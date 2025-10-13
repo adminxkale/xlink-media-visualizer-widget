@@ -79,7 +79,8 @@ export default function ChatInterface() {
 
   const fetchMedia = async () => {
     try {
-      const res = await fetch(`/api/proxy-media/?bussinesNumber=${businessNumber}&clientNumber=${customerNumber}`);
+      //const res = await fetch(`/api/proxy-media/?bussinesNumber=${businessNumber}&clientNumber=${customerNumber}`);
+      const res = await fetch(`/api/proxy-media/?bussinesNumber=12053505800&clientNumber=593992966075`);
       if (!res.ok) throw new Error(`Error fetching media: ${res.statusText}`);
       const data = await res.json();
       console.log("Fetched media items:", data);
@@ -153,7 +154,8 @@ export default function ChatInterface() {
           }
           const redirectUri = `${window.location.origin}/`;
 
-          const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+          
+const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
           window.location.replace(authUrl);
           return;
         }

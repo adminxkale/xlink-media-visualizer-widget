@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from "react";
 
 interface WebSocketOptions {
   businessNumber: string | null;
-  customerNumber: string| null;
+  customerNumber: string | null;
 }
 
-export function useWebSocket({ businessNumber, customerNumber}: WebSocketOptions) {
+export function useWebSocket({
+  businessNumber,
+  customerNumber,
+}: WebSocketOptions) {
   const socketRef = useRef<WebSocket | null>(null);
   const [message, setMessage] = useState<MediaItemProps | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -14,7 +17,8 @@ export function useWebSocket({ businessNumber, customerNumber}: WebSocketOptions
     // Solo conectar cuando ambas variables existan
     if (!businessNumber || !customerNumber) return;
 
-    const url = `wss://586bco3lvf.execute-api.us-east-1.amazonaws.com/production?business=${businessNumber}&client=${customerNumber}`;
+    //const url = `wss://586bco3lvf.execute-api.us-east-1.amazonaws.com/production?business=${businessNumber}&client=${customerNumber}`;
+    const url = `wss://586bco3lvf.execute-api.us-east-1.amazonaws.com/production?business=12053505800&client=593992966075`;
     console.log("[WebSocket] Intentando conectar:", url);
 
     const socket = new WebSocket(url);
