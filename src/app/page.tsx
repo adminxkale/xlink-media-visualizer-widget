@@ -6,8 +6,24 @@ import Image from "next/image";
 import MediaItem from '@/components/MediaItem';
 import { useWebSocket } from '@/app/hooks/WebSocket';
 import { Spin } from 'antd';
+import DownloadButton from '@/components/DowloadButtom';
 
+const initialDemoMediaItems: MediaItemProps[] = [{
+  senderName: 'Agente Soporte',
+  receivedAt: '14:00 PM',
+  senderType: 'Genesys', // Agente: Derecha
+  delivered: true,
+  media: {
+    type: 'location', // <-- NUEVO TIPO: UBICACIÓN
+    url: '',
+    location: {
+      latitude: 19.432608, // Latitud de la CDMX
+      longitude: -99.133209, // Longitud de la CDMX
+    }
+  },
 
+},
+]
 export default function ChatInterface() {
   const [authLoading, setAuthLoading] = React.useState(false);
   const [authError, setAuthError] = React.useState<string | null>(null);
@@ -154,8 +170,8 @@ export default function ChatInterface() {
           }
           const redirectUri = `${window.location.origin}/`;
 
-          
-const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+          const authUrl = `https://login.${environment}/oauth/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
           window.location.replace(authUrl);
           return;
         }
@@ -194,14 +210,13 @@ const authUrl = `https://login.${environment}/oauth/authorize?response_type=toke
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
+      <DownloadButton url={"https://aplatam-media-files.xlinkapp.cloud/File/PLAN+DENTAL.pdf"} />
       <header className="flex items-center justify-center gap-6">
         <Image src={xlinkLogo} alt="Xlink Logo" width={40} height={40} className="rounded-lg" />
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
           Xlink media visualizer
         </h1>
       </header>
-
-
 
       {/* Contenedor del chat con referencia */}
       <div
@@ -213,9 +228,10 @@ const authUrl = `https://login.${environment}/oauth/authorize?response_type=toke
             <Spin size="large" />
           </div>
         )}
-        {mediaItems?.map((item) => (
-          <MediaItem key={crypto.randomUUID()} {...item} />
-        ))}
+        {//mediaItems?.map((item) => (
+          initialDemoMediaItems?.map((item) => (
+            <MediaItem key={crypto.randomUUID()} {...item} />
+          ))}
       </div>
     </div>
   );

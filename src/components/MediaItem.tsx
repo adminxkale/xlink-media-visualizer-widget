@@ -79,7 +79,6 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
                 {formatDateTime(receivedAt)}
               </div>
               <div></div>
-
             </>
           ) : (
             <>

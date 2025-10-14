@@ -1,32 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, Card, Typography, Button } from "antd";
+import DownloadButton from "./DowloadButtom";
+import { EnvironmentOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
-
-interface MediaData {
-  type: "image" | "video" | "audio" | "sticker" | "file";
-  url: string;
-  name?: string; // opcional, nombre del archivo
-}
 
 const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
   const isWebp = media.url.toLowerCase().endsWith(".webp");
   const imagePlaceholderText = isWebp ? "Error Carga Imagen WebP" : "Error Carga Imagen";
 
-  // Función genérica para forzar la descarga
-const handleDownload = async () => {
-  try {
-    const proxyUrl = `/api/proxy-download/?url=${encodeURIComponent(media.url)}`;
-    const link = document.createElement("a");
-    link.href = proxyUrl;
-    link.download = media.url.split("/").pop() || "archivo";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error("Error al descargar:", error);
-  }
-};
 
   switch (media.type) {
     case "image":
@@ -46,9 +28,7 @@ const handleDownload = async () => {
               </div>
             }
           />
-          <Button type="primary" className="mt-2" onClick={handleDownload}>
-            Descargar imagen
-          </Button>
+          <DownloadButton url={media.url} />
         </Card>
       );
 
@@ -63,9 +43,7 @@ const handleDownload = async () => {
             <source src={media.url} type="video/mp4" />
             Tu navegador no soporta la etiqueta de video.
           </video>
-          <Button type="primary" className="mt-2" onClick={handleDownload}>
-            Descargar video
-          </Button>
+          <DownloadButton url={media.url} />
         </Card>
       );
 
@@ -88,9 +66,7 @@ const handleDownload = async () => {
             </svg>
             <audio controls src={media.url} className="flex-grow" />
           </div>
-          <Button type="primary" className="mt-2" onClick={handleDownload}>
-            Descargar audio
-          </Button>
+          <DownloadButton url={media.url} />
         </Card>
       );
 
@@ -118,11 +94,56 @@ const handleDownload = async () => {
             </svg>
             <span className="truncate">Ver archivo</span>
           </a>
-          <Button type="primary" className="mt-2" onClick={handleDownload}>
-            Descargar archivo
-          </Button>
+          <DownloadButton url={media.url} />
         </Card>
       );
+case "location": {
+  const { location } = media;
+
+  const mapSrc = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}&z=15&output=embed`;
+  const externalLink = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}`;
+  const locationName = "Ubicación Compartida";
+
+  // Estado para mostrar mensaje de "copiado"
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(externalLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // vuelve al texto original después de 2s
+    } catch (err) {
+      console.error("Error al copiar el enlace:", err);
+    }
+  };
+
+  return (
+    <Card className="rounded-lg overflow-hidden shadow-md w-full">
+      {/* Mapa incrustado */}
+      <iframe
+        title={locationName}
+        width="100%"
+        height="200"
+        style={{ border: 0, borderRadius: "8px 8px 0 0" }}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        src={mapSrc}
+      ></iframe>
+
+      {/* Botón para copiar enlace */}
+      <Button
+        onClick={handleCopyLink}
+        className={`block w-full p-3 text-center bg-white border-t border-gray-100 transition-colors ${
+          copied
+            ? "text-green-600 font-semibold"
+            : "text-indigo-600 hover:text-indigo-700"
+        }`}
+      >
+        {copied ? "Enlace copiado" : "Copiar enlace de Google Maps"}
+      </Button>
+    </Card>
+  );
+}
 
     default:
       return (
