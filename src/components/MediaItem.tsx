@@ -69,7 +69,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ senderName, receivedAt, media, se
 
         {/* Contenido Multimedia */}
         <div className="mb-2">
-          <MediaContent media={media} />
+          <MediaContent media={media} fileName={fileName}/>
         </div>
         {/* Fecha de Envío (Metadatos) */}
         <div className="flex justify-between items-center">

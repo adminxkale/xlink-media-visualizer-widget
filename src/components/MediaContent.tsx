@@ -4,10 +4,14 @@ import DownloadButton from "./DowloadButtom";
 import { EnvironmentOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
-
-const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
-  const isWebp = media.url.toLowerCase().endsWith(".webp");
-  const imagePlaceholderText = isWebp ? "Error Carga Imagen WebP" : "Error Carga Imagen";
+interface MediaContentProps {
+  media: MediaData;
+  fileName: string;
+}
+const MediaContent: React.FC<MediaContentProps> = ({ media, fileName }) => {
+  //const isWebp = media.url.toLowerCase().endsWith(".webp");
+  //const imagePlaceholderText = isWebp ? "Error Carga Imagen WebP" : "Error Carga Imagen";
+  const imagePlaceholderText = "Error Carga Imagen WebP";
 
 
   switch (media.type) {
@@ -28,7 +32,9 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
               </div>
             }
           />
-          <DownloadButton url={media.url} />
+          <div className="mt-2 flex items-center justify-center">
+            <DownloadButton url={media.url} label={true} />
+          </div>
         </Card>
       );
 
@@ -43,7 +49,9 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
             <source src={media.url} type="video/mp4" />
             Tu navegador no soporta la etiqueta de video.
           </video>
-          <DownloadButton url={media.url} />
+          <div className="mt-2 flex items-center justify-center">
+            <DownloadButton url={media.url} label={true} />
+          </div>
         </Card>
       );
 
@@ -65,18 +73,15 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
               />
             </svg>
             <audio controls src={media.url} className="flex-grow" />
+            <DownloadButton url={media.url} label={false} />
           </div>
-          <DownloadButton url={media.url} />
         </Card>
       );
 
     case "file":
       return (
         <Card className="rounded-lg overflow-hidden shadow-sm flex flex-col gap-2">
-          <a
-            href={media.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <div
             className="flex items-center p-3 transition-colors duration-150 rounded-lg hover:bg-gray-200"
           >
             <svg
@@ -92,58 +97,58 @@ const MediaContent: React.FC<{ media: MediaData }> = ({ media }) => {
                 d="M9 12h6m-6 4h6m-5 5h-1a2 2 0 01-2-2V7a2 2 0 012-2h4l4 4v10a2 2 0 01-2 2h-1.5"
               />
             </svg>
-            <span className="truncate">Ver archivo</span>
-          </a>
-          <DownloadButton url={media.url} />
+            <span className="truncate mr-1">{fileName}</span>
+            <DownloadButton url={media.url} label={false} />
+          </div>
+
         </Card>
       );
-case "location": {
-  const { location } = media;
+    case "location": {
+      const { location } = media;
 
-  const mapSrc = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}&z=15&output=embed`;
-  const externalLink = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}`;
-  const locationName = "Ubicación Compartida";
+      const mapSrc = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}&z=15&output=embed`;
+      const externalLink = `https://maps.google.com/maps?q=${location?.latitude},${location?.longitude}`;
+      const locationName = "Ubicación Compartida";
 
-  // Estado para mostrar mensaje de "copiado"
-  const [copied, setCopied] = useState(false);
+      // Estado para mostrar mensaje de "copiado"
+      const [copied, setCopied] = useState(false);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(externalLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // vuelve al texto original después de 2s
-    } catch (err) {
-      console.error("Error al copiar el enlace:", err);
+      const handleCopyLink = async () => {
+        try {
+          await navigator.clipboard.writeText(externalLink);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000); // vuelve al texto original después de 2s
+        } catch (err) {
+          console.error("Error al copiar el enlace:", err);
+        }
+      };
+
+      return (
+        <Card className="rounded-lg overflow-hidden shadow-md w-full">
+          {/* Mapa incrustado */}
+          <iframe
+            title={locationName}
+            width="100%"
+            height="200"
+            style={{ border: 0, borderRadius: "8px 8px 0 0" }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={mapSrc}
+          ></iframe>
+
+          {/* Botón para copiar enlace */}
+          <Button
+            onClick={handleCopyLink}
+            className={`block w-full p-3 text-center bg-white border-t border-gray-100 transition-colors ${copied
+              ? "text-green-600 font-semibold"
+              : "text-indigo-600 hover:text-indigo-700"
+              }`}
+          >
+            {copied ? "Enlace copiado" : "Copiar enlace de Google Maps"}
+          </Button>
+        </Card>
+      );
     }
-  };
-
-  return (
-    <Card className="rounded-lg overflow-hidden shadow-md w-full">
-      {/* Mapa incrustado */}
-      <iframe
-        title={locationName}
-        width="100%"
-        height="200"
-        style={{ border: 0, borderRadius: "8px 8px 0 0" }}
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        src={mapSrc}
-      ></iframe>
-
-      {/* Botón para copiar enlace */}
-      <Button
-        onClick={handleCopyLink}
-        className={`block w-full p-3 text-center bg-white border-t border-gray-100 transition-colors ${
-          copied
-            ? "text-green-600 font-semibold"
-            : "text-indigo-600 hover:text-indigo-700"
-        }`}
-      >
-        {copied ? "Enlace copiado" : "Copiar enlace de Google Maps"}
-      </Button>
-    </Card>
-  );
-}
 
     default:
       return (

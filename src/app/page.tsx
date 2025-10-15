@@ -85,11 +85,14 @@ export default function ChatInterface() {
   }
 
   useEffect(() => {
-    fetchQueueData().then((data) => {
-      console.log("data", data)
-      setBusinessNumber(data.attributes.business_phone_number)
-      setCustomerNumber(data.attributes.customer_phone_number)
-    })
+    if (conversationId) {
+      fetchQueueData().then((data) => {
+        console.log("data", data)
+        setBusinessNumber(data.attributes.business_phone_number)
+        setCustomerNumber(data.attributes.customer_phone_number)
+      })
+      }
+      console.log("La conversacion es:",conversationId)
   }, [conversationId]);
 
 
@@ -210,7 +213,6 @@ export default function ChatInterface() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
-      <DownloadButton url={"https://aplatam-media-files.xlinkapp.cloud/File/PLAN+DENTAL.pdf"} />
       <header className="flex items-center justify-center gap-6">
         <Image src={xlinkLogo} alt="Xlink Logo" width={40} height={40} className="rounded-lg" />
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
@@ -228,10 +230,10 @@ export default function ChatInterface() {
             <Spin size="large" />
           </div>
         )}
-        {//mediaItems?.map((item) => (
-          initialDemoMediaItems?.map((item) => (
-            <MediaItem key={crypto.randomUUID()} {...item} />
-          ))}
+        {mediaItems?.map((item) => (
+          // initialDemoMediaItems?.map((item) => (
+          <MediaItem key={crypto.randomUUID()} {...item} />
+        ))}
       </div>
     </div>
   );
