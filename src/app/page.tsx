@@ -42,7 +42,10 @@ export default function ChatInterface() {
   // Referencia al contenedor del chat
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-
+  useEffect(() => {
+    setCustomerNumber("593992966075");
+    setBusinessNumber("12053505800");
+  }, []);
 
   //  Scroll automático al final cuando cambia mediaItems
   useEffect(() => {
