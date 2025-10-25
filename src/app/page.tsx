@@ -5,8 +5,10 @@ import xlinkLogo from "@/assets/images/xlink_logo_v2.png";
 import Image from "next/image";
 import MediaItem from '@/components/MediaItem';
 import { useWebSocket } from '@/app/hooks/WebSocket';
-import { Spin } from 'antd';
+import { Button, Spin } from 'antd';
 import DownloadButton from '@/components/DowloadButtom';
+import AudioRecorderModal from '@/components/AudioRecorder';
+import Menu from '@/components/Menu';
 
 const initialDemoMediaItems: MediaItemProps[] = [{
   senderName: 'Agente Soporte',
@@ -42,6 +44,8 @@ export default function ChatInterface() {
   // Referencia al contenedor del chat
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+
+  // Valores fijos para pruebas
   useEffect(() => {
     setCustomerNumber("593992966075");
     setBusinessNumber("12053505800");
@@ -215,7 +219,7 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
+    <div className="h-screen bg-gray-50 p-4 sm:p-8 font-sans">
       <header className="flex items-center justify-center gap-6">
         <Image src={xlinkLogo} alt="Xlink Logo" width={40} height={40} className="rounded-lg" />
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
@@ -237,6 +241,11 @@ export default function ChatInterface() {
           // initialDemoMediaItems?.map((item) => (
           <MediaItem key={crypto.randomUUID()} {...item} />
         ))}
+      </div>
+      <div
+      className="max-w-6xl mx-auto  rounded-xl p-4 sm:p-6 mb-8  h-auto border border-red-200"
+      >
+        <Menu></Menu>
       </div>
     </div>
   );
